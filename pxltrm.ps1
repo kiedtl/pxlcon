@@ -1,8 +1,10 @@
-#!/usr/bin/env bash
-#
-# pxltrm - A pixel art editor for the terminal.
+$E = [char]27
 
-clear_screen() {
+function printf($text) {
+    write-host ($text -replace "\e", "$E")
+}
+
+function clear_screen() {
     printf '\e[2J\e[2;H\e[m'
     unset hist undos
 }
