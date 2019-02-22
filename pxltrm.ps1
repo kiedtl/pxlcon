@@ -6,10 +6,11 @@ function printf($text) {
 
 function clear_screen() {
     printf '\e[2J\e[2;H\e[m'
-    unset hist undos
+    $hist = $null
+    $undos = $null
 }
 
-status_line_clean() {
+function status_line_clean() {
     printf '\e[s\e[%b;H\e[J\e[u' "$((LINES-3))"
 }
 
