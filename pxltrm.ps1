@@ -1,143 +1,152 @@
 $E = [char]27
+$R = "255"
+$G = "255"
+$B = "255"
 
-function printf($text) {
-    write-host ($text -replace "\e", "$E")
+$Brush = [text.encoding]::utf8.getstring((226,150,136))
+$defBrush = [text.encoding]::utf8.getstring((226,150,136))
+
+$history = New-Object System.Collections.Generic.List[string]
+
+function print($txt) {
+	write-host $txt -nonewline
+	$history.Add($txt)
+}
+
+function save_file($dest) {
+	set-content $dest "$E[2J$E[2;H$(($history.ToArray()) -join '')$E[m$E[$(($host.UI.RawUI.WindowSize.Height)-3);H"
+}
+
+function load_file($file) {
+	clear_screen
+	write-host "$E[2;H$(get-content $file)$E[2;H" -nonewline
+	# hist+=("$_")
+}
+
+function print_menu() {
+	$postion = $host.UI.RawUI.CursorPosition
+	$postion.Y = 0
+	$postion.X = 0
+	$host.UI.RawUI.CursorPosition = $postion
+
+	write-host " [$E[38;2;255;255;255md$E[0m]raw,  [$E[38;2;255;255;255me$E[0m]rase,  cle[$E[38;2;255;255;255ma$E[0m]r,  [$E[38;2;255;255;255ms$E[0m]ave,  [$E[38;2;255;255;255mo$E[0m]pen,  [$E[38;2;255;255;255mq$E[0m]uit"
+}
+
+function print_status() {
+	write-host "$E[$(($host.UI.RawUI.WindowSize.Height)-1);H$E[J" -nonewline
+	write-host " [$E[38;2;255;255;255mc$E[0m]olor: $E[38;2;${R};${G};${B}m${R},${G},${B}$E[0m, [$E[38;2;255;255;255mb$E[0m]rush: $Brush" -nonewlin
+}
+
+function prompt($mode) {
+	write-host "$E[s$E[$(($host.UI.RawUI.WindowSize.Height)-3);H$E[m" -nonewline
+	$r = ""
+
+	switch ($mode) {
+		s {
+			write-host " save as: " -nonewline
+			$r = [system.console]::readline() 
+		}
+		o {
+			write-host " open file: " -nonewline
+			$r = [system.console]::readline() 
+		}
+		c {
+			write-host " input rgb value: " -nonewline
+			$r = [system.console]::readline() 
+		}
+		b {
+			write-host " input rgb value: " -nonewline
+			$r = [system.console]::readline() 
+		}
+		a {
+			write-host " clear screen and undo info? [y/n]: " -nonewline
+			$r = [system.console]::readline() 
+		}
+	}
+
+	write-host "$E[u" -nonewline
+	write-host "$E[s$E[$(($host.UI.RawUI.WindowSize.Height)-3);H$E[J$E[u" -nonewline
+	# status_line
+
+	print_status
+	print_menu
+	return $r
 }
 
 function clear_screen() {
-    printf '\e[2J\e[2;H\e[m'
-    $hist = $null
-    $undos = $null
+	write-host '$E[2J$E[2;H$E[m' -nonewline
+	$history = New-Object System.Collections.Generic.List[string]
+	$Brush = $defBrush
+	$R = "255"
+	$G = "255"
+	$B = "255"
 }
 
-function status_line_clean() {
-    printf '\e[s\e[%b;H\e[J\e[u' "$((LINES-3))"
+$postion = $host.UI.RawUI.CursorPosition
+$postion.Y = 0
+$postion.X = 0
+$host.UI.RawUI.CursorPosition = $postion
+
+clear_screen
+print_status
+print_menu
+
+write-host "$E[?12l" -nonewline
+
+while ($true) {
+	$key = [System.Console]::ReadKey($true)
+	switch ($key.Key) {
+		q {
+			clear_screen 
+			write-host "$E[?12h" -nonewline
+			exit
+		}
+		d {
+			print "$E[38;2;${R};${G};${B}m$Brush$E[0m$E[1D"
+		}
+		e {
+			print "$E[30m$defBrush$E[0m"
+			print "$E[1D"
+		}
+		a {
+			$yn = prompt a
+			if ("y*" -like $yn) {
+				clear_screen
+				print_status
+				print_menu
+			}
+		}
+		c {
+			$color = (prompt c).Split(",")
+			$R = $color[0]
+			$G = $color[1]
+			$B = $color[2]
+		}
+		b {
+			$Brush = prompt b
+		}
+		o {
+			load_file (prompt o)
+			print_menu
+		}
+		s {
+			save_file (prompt s)
+		}
+		LeftArrow {
+			print "$E[1D"
+		}
+		RightArrow {
+			print "$E[1C"
+		}
+		DownArrow {
+			if (($host.UI.RawUI.CursorPosition.Y) -lt (($host.UI.RawUI.WindowSize.Height) - 3)) { 
+				print "$E[1B"
+			}
+		}
+		UpArrow {
+			if (($host.UI.RawUI.CursorPosition.Y) -gt ((1))) { 
+				print "$E[1A"
+			}
+		}
+	}
 }
-
-get_term_size() {
-    shopt -s checkwinsize; (:;:)
-    [[ -z "${LINES:+$COLUMNS}" ]] && read -r LINES COLUMNS < <(stty size)
-}
-
-print_palette() {
-    for i in {1..8}; do
-        [[ "$i" == "$color" ]] && block_char="▃" || block_char=" "
-        status+="\\e[48;5;${i}m\\e[30m${block_width// /${block_char}}\\e[m"
-    done
-}
-
-status_line() {
-    local status
-
-    printf -v block_width "%$((COLUMNS / 24))s"
-    printf -v padding '\e[%bC' "$((COLUMNS - COLUMNS / 3))"
-
-    print_color
-    print_palette
-
-    hud="[d]raw, [e]rase, cle[a]r, [s]ave, [o]pen, [u]ndo, [r]edo"
-    hud="${hud::$COLUMNS}"
-    hud="${hud//\[/[\\e[1m}"
-
-    printf '\e[s\e[;H\e[2K\e[m%b\e[%s;H\e[m%b\e[m, %b\e[m\e[99999D\e[A%b\e[u' \
-           "${hud//\]/\\e[m\]}" \
-           "$((LINES-2))" \
-           "[\\e[1mc\\e[m]olor: \\e[1m${print_col}${color}" \
-           "[\\e[1mb\\e[m]rush: \\e[1m${brush_char:=█}" \
-           "${padding}${status//▃/ }\\n${padding}${status}"
-}
-
-save_file() {
-    local IFS=
-    printf '\e[2J\e[2;H%b\e[m\e[%s;H' "${hist[*]}" "$((LINES-3))"
-}
-
-load_file() {
-    clear_screen
-    printf '\e[2;H%b\e[2;H' "$(<"$1")"
-    hist+=("$_")
-}
-
-undo() {
-    undos+=("${hist[-1]}")
-    printf '%b \b' "${hist[-1]}"
-    unset 'hist[-1]'
-}
-
-redo() {
-    hist+=("${undos[-1]}")
-    printf '%b' "${undos[-1]}"
-    unset 'undos[-1]'
-}
-
-hex_to_rgb() {
-    ((r=16#${color:1:2},g=16#${color:3:2},b=16#${color:5:6}))
-}
-
-get_pos() {
-    IFS='[;' read -p $'\e[6n' -d R -rs _ y x _
-}
-
-print_color() {
-    case "${color:=7}" in
-        "#"*) hex_to_rgb;: "\\e[38;2;${r};${g};${b}m" ;;
-        [0-9]*):           "\\e[38;5;${color}m" ;;
-        *) color="7";:     "\\e[38;5;7m" ;;
-    esac
-    printf -v print_col '%b' "$_"
-}
-
-paint() {
-    get_pos
-    printf '%b' "\\e[${y};${x}H${2}${1}\\b"
-    hist+=("$_")
-}
-
-prompt() {
-    printf '\e[s\e[%s;H\e[m' "$((LINES-1))"
-
-    case "$1" in
-        s) read -rp "save file: " f; save_file > "${f:-/dev/null}" ;;
-        o) read -rp "load file: " f; [[ -f "$f" ]] && load_file "$f" ;;
-        c) read -rp "input color: " color ;;
-        b) read -rp "input brush: " brush_char ;;
-        a) read -n 1 -rp "clear? [y/n]: " y; [[ "$y" == y ]] && clear_screen ;;
-    esac
-
-    printf '\e[u'
-    status_line_clean
-    status_line
-}
-
-cursor() {
-    case "${1: -1}" in
-        A|k) get_pos; ((y>2))         && printf '\e[A' ;;
-        B|j) get_pos; ((y<LINES-4))   && printf '\e[B' ;;
-        C|l) get_pos; ((x<COLUMNS-1)) && printf '\e[C' ;;
-        D|h) printf '\e[D' ;;
-        H)   printf '\e[999999D' ;;
-        L)   printf '\e[999999C\e[D' ;;
-
-        [1-8]) color="${1: -1}"; status_line ;;
-
-        e) paint " " ;;
-        d) print_color; paint "${brush_char:=█}" "$print_col" ;;
-        u) (("${#hist}">0))  && undo; status_line ;;
-        r) (("${#undos}">1)) && redo; status_line ;;
-
-        a|b|c|o|s) prompt "${1: -1}" ;;
-    esac
-}
-
-main() {
-    clear_screen
-    get_term_size
-    status_line
-
-    trap 'clear_screen' EXIT
-    trap 'status_line_clean; get_term_size; status_line' SIGWINCH
-
-    for ((;;)); { read -rs -n 1 key; cursor "$key"; }
-}
-
-main "$@"
