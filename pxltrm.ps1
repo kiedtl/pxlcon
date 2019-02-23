@@ -9,7 +9,6 @@ $Brush = [text.encoding]::utf8.getstring((226,150,136))
 $defBrush = [text.encoding]::utf8.getstring((226,150,136))
 $history = New-Object System.Collections.Generic.List[string]
 
-
 $postion = $host.UI.RawUI.CursorPosition
 $postion.Y = 0
 $postion.X = 0

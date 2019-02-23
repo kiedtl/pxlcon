@@ -4,7 +4,7 @@ function print($txt) {
 }
 
 function save_file($dest) {
-	set-content $dest "$E[2J$E[2;H$(($history.ToArray()) -join '')$E[m$E[$(($host.UI.RawUI.WindowSize.Height)-3);H"
+	set-content $dest "$E[2J$E[2;H$(($history.ToArray()) -join '')$E[m$E[$(($host.UI.RawUI.WindowSize.Height)-3);H" -encoding UTF8
 }
 
 function load_file($file) {
