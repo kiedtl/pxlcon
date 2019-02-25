@@ -47,3 +47,6 @@ Pxlcon is an tiny pixel art editor for the terminal, which you control with the 
 - [ ] Test on *nix systems and macOS.
 - [ ] Implement color palette.
 
+## Inspiration
+- [pxltrm](https://github.com/dylanaraps/pxltrm)
+
