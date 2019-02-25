@@ -24,7 +24,7 @@ function print_menu() {
 
 function print_status() {
 	write-host "$E[$(($host.UI.RawUI.WindowSize.Height)-1);H$E[J" -nonewline
-	write-host " [$E[38;2;255;255;255mc$E[0m]olor: $E[38;2;${R};${G};${B}m${R},${G},${B}$E[0m, [$E[38;2;255;255;255mb$E[0m]rush: $Brush" -nonewline
+	write-host " [$E[38;2;255;255;255mc$E[0m]olor: ${R},${G},${B}, [$E[38;2;255;255;255mb$E[0m]rush: $Brush" -nonewline
 }
 
 function prompt($mode) {
