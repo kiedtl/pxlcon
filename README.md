@@ -19,7 +19,7 @@ Pxlcon is an tiny pixel art editor for the terminal, which you control with the 
 **Note:** This project is currently WIP. If you break it or want a feature, file an issue!
 
 
-## Dependencies
+## Requirements
 
 - PowerShell 5 (or later)
 - .NET 4.5 (or later)
@@ -27,8 +27,15 @@ Pxlcon is an tiny pixel art editor for the terminal, which you control with the 
 
 
 ## Installation
+### Scoop
+- Use [Scoop](https://scoop.sh).
+    ```
+    scoop bucket add lptstr https://github.com/lptstr/lptstr-scoop
+    scoop install pxlcon
+    ```
 
-- Move `pxltrm` somewhere in your `$PATH`.
+### macOS
+- Move `pxlcon.ps1` somewhere in your `$PATH`.
 
 
 ## TODO
