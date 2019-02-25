@@ -2,8 +2,11 @@
 <p align="center">A [WIP] cross-platform pixel art editor for the terminal.</p>
 
 <p align="center">
-<img alt="GitHub code size in bytes" src="https://img.shields.io/github/languages/code-size/lptstr/pxlcon.svg">
-<img alt="GitHub" src="https://img.shields.io/github/license/lptstr/pxlcon.svg">
+    <img alt="GitHub code size in bytes" src="https://img.shields.io/github/languages/code-size/lptstr/pxlcon.svg">
+    <a href="https://www.codacy.com/app/lptstr/pxlcon?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=lptstr/pxlcon&amp;utm_campaign=Badge_Grade">
+        <img src="https://api.codacy.com/project/badge/Grade/1bd99c5bb57b4e86867579ccb9c72eed"/>
+    </a>
+    <img alt="GitHub" src="https://img.shields.io/github/license/lptstr/pxlcon.svg">
 </p>
 
 <img src="https://lptstr.github.io/lptstr-images/screenshots/projects/pxlcon/screenshot.png" alt="pxlcon" align="right"
