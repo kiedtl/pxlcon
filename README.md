@@ -30,14 +30,14 @@ Pxlcon is an tiny pixel art editor for the terminal, which you control with the 
 
 
 ## Installation
-### Scoop
+### Windows
 - Use [Scoop](https://scoop.sh).
     ```
     scoop bucket add lptstr https://github.com/lptstr/lptstr-scoop
     scoop install pxlcon
     ```
 
-### macOS
+### macOS/Linux
 - Move `pxlcon.ps1` somewhere in your `$PATH`.
 
 
