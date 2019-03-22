@@ -28,7 +28,7 @@ while ($true) {
 	switch ($key.Key) {
 		q {
 			clear_screen
-      write-host "#E[?1049h" -nonewline
+                        write-host "$E[?1049h" -nonewline
 			write-host "$E[?12h" -nonewline
 			exit
 		}
