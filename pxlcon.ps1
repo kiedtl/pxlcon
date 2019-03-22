@@ -1,6 +1,8 @@
+#!/usr/bin/env pwsh
+
 . "$psscriptroot\lib\core.ps1"
 
-$E = [char]27
+$E = [char]0x1B
 $R = "255"
 $G = "255"
 $B = "255"
@@ -14,6 +16,7 @@ $postion.Y = 0
 $postion.X = 0
 $host.UI.RawUI.CursorPosition = $postion
 
+write-host "$E[?1049l" -nonewline 
 clear_screen
 print_status
 print_menu
@@ -24,7 +27,8 @@ while ($true) {
 	$key = [System.Console]::ReadKey($true)
 	switch ($key.Key) {
 		q {
-			clear_screen 
+			clear_screen
+      write-host "#E[?1049h" -nonewline
 			write-host "$E[?12h" -nonewline
 			exit
 		}
