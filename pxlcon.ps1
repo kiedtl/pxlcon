@@ -44,18 +44,22 @@ function status_line_clean() {
     write-host "$E[s$E[$($LINES-3);H$E[J$E[u"
 }
 
-function get_term_size() {
+function get_term_size() { # TODO
     shopt -s checkwinsize; (:;:)
 
     [[ -z "${LINES:+$COLUMNS}" ]] && \
         read -r LINES COLUMNS < <(stty size)
 }
 
-print_palette() {
-    for i in {1..8}; do
-        [[ "$i" == "$color" ]] && block_char="▃" || block_char=" "
+function print_palette() {
+    1..8 | % {
+        if ($_ -eq $color) {
+            $block_char = "▃"
+        } else {
+            $block_char = " "
+        }
         status+="\\e[48;5;${i}m\\e[30m${block_width// /${block_char}}\\e[m"
-    done
+    }
 }
 
 status_line() {
